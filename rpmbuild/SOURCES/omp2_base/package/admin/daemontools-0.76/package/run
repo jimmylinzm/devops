@@ -1,0 +1,9 @@
+#!/bin/sh -e
+
+umask 022
+
+echo 'start on runlevel [345]' > /etc/init/svscan.conf
+echo 'respawn' >> /etc/init/svscan.conf
+echo 'exec /command/svscanboot' >> /etc/init/svscan.conf
+initctl reload-configuration
+initctl start svscan

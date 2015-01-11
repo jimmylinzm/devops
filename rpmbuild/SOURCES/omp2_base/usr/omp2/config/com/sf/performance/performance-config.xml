@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="configuration" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:datasource_configuration.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="dataSourceLocal" name="dataSource"
+          class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"> </property>
+        <property name="url" value="${datasource.url}"> </property>
+        <property name="username" value="${datasource.username}"></property>
+        <property name="password" value="${datasource.password}"></property>
+        <property name="maxActive" value="100"></property>
+        <property name="maxIdle" value="5"></property>
+        <property name="maxWait" value="10000"></property>
+    </bean>
+
+    <bean id="localSessionFactory"
+          class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSourceLocal"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">
+                    org.hibernate.dialect.Oracle10gDialect
+                </prop>
+                <prop key="hibernate.show_sql">false</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="barRecordDao" class="com.sf.performance.dataloader.dao.BarRecordDao">
+        <property name="sessionFactory" ref="localSessionFactory"/>
+    </bean>
+
+	<bean id="barRecordLoader" class="com.sf.performance.dataloader.BarRecordLoader" scope="prototype">
+		<property name="maxModValue" value="6"/>
+        <property name="pageSize" value="800"/>
+        <property name="barRecordDao" ref="barRecordDao"/>
+    </bean>
+
+    <bean id="wayBillLoaderDao" class="com.sf.performance.dataloader.dao.WayBillLoaderDao">
+        <property name="sessionFactory" ref="localSessionFactory"/>
+    </bean>
+
+    <bean id="dataDeleteDao" class="com.sf.performance.dataloader.dao.DataDeleteDao">
+        <property name="sessionFactory" ref="localSessionFactory"/>
+    </bean>
+
+    <bean id="dataLoader" class="com.sf.performance.dataloader.DataLoader">
+        <property name="pageSize" value="800"/>
+        <property name="wayBillLoaderDao" ref="wayBillLoaderDao"/>
+        <property name="dataDeleteDao" ref="dataDeleteDao"/>
+    </bean>
+
+</beans>
+

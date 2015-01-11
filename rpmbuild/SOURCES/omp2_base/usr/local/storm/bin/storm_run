@@ -1,0 +1,6 @@
+#!/bin/sh
+ulimit -c unlimited
+source /etc/profile.d/init_java_home.sh
+source /etc/profile.d/init_zookeeper.sh
+source /etc/profile.d/storm-init.sh
+cd /usr/local/storm && bin/storm $1 
